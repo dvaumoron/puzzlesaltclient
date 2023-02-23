@@ -48,17 +48,17 @@ func (c Client) Salt(login string, password string) (string, error) {
 		return "", err
 	}
 
-	dk, err := scrypt.Key([]byte(password), []byte(salt), n, r, p, keyLen)
+	dk, err := scrypt.Key([]byte(password), salt, n, r, p, keyLen)
 	if err != nil {
 		return "", err
 	}
 	return base64.StdEncoding.EncodeToString(dk), nil
 }
 
-func (c Client) loadOrGenerate(login string) (string, error) {
+func (c Client) loadOrGenerate(login string) ([]byte, error) {
 	conn, err := grpc.Dial(c.saltServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer conn.Close()
 
@@ -67,7 +67,7 @@ func (c Client) loadOrGenerate(login string) (string, error) {
 
 	response, err := pb.NewSaltClient(conn).LoadOrGenerate(ctx, &pb.Request{Login: login})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	return response.Salt, nil
 }

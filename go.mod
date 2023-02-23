@@ -3,7 +3,7 @@ module github.com/dvaumoron/puzzlesaltclient
 go 1.19
 
 require (
-	github.com/dvaumoron/puzzlesaltservice v1.0.0
+	github.com/dvaumoron/puzzlesaltservice v1.0.1
 	golang.org/x/crypto v0.5.0
 	google.golang.org/grpc v1.52.3
 )

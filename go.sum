@@ -1,5 +1,5 @@
-github.com/dvaumoron/puzzlesaltservice v1.0.0 h1:nuNN7cUVGv/kpb/bSAnTnKE7FS0WV86qQoVFk9B4tes=
-github.com/dvaumoron/puzzlesaltservice v1.0.0/go.mod h1:S95i9P8YgmzHpVEXiBIZhaBnlyhsfJD+UBsgFQIKkzc=
+github.com/dvaumoron/puzzlesaltservice v1.0.1 h1:VbqSOfYYTX2RZrKn0FIiL5ULie/cbSRx/7zSRGmFc5g=
+github.com/dvaumoron/puzzlesaltservice v1.0.1/go.mod h1:S95i9P8YgmzHpVEXiBIZhaBnlyhsfJD+UBsgFQIKkzc=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
 github.com/golang/protobuf v1.5.2 h1:ROPKBNFfQgOUMifHyP+KYbvpjbdoFNs+aK7DXlji0Tw=
 github.com/golang/protobuf v1.5.2/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiuN0vRsmY=
