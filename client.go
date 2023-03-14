@@ -25,7 +25,6 @@ import (
 	pb "github.com/dvaumoron/puzzlesaltservice"
 	"golang.org/x/crypto/scrypt"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 // those values are not configurable because a change imply a migration of user database.
@@ -36,10 +35,12 @@ const keyLen = 64
 
 type Client struct {
 	saltServiceAddr string
+	dialOptions     grpc.DialOption
+	timeOut         time.Duration
 }
 
-func Make(saltServiceAddr string) Client {
-	return Client{saltServiceAddr: saltServiceAddr}
+func Make(saltServiceAddr string, dialOptions grpc.DialOption, timeOut time.Duration) Client {
+	return Client{saltServiceAddr: saltServiceAddr, dialOptions: dialOptions, timeOut: timeOut}
 }
 
 func (c Client) Salt(login string, password string) (string, error) {
@@ -56,13 +57,13 @@ func (c Client) Salt(login string, password string) (string, error) {
 }
 
 func (c Client) loadOrGenerate(login string) ([]byte, error) {
-	conn, err := grpc.Dial(c.saltServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(c.saltServiceAddr, c.dialOptions)
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
 	defer cancel()
 
 	response, err := pb.NewSaltClient(conn).LoadOrGenerate(ctx, &pb.Request{Login: login})
