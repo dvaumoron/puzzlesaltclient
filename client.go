@@ -18,10 +18,10 @@
 package puzzlesaltclient
 
 import (
-	"context"
 	"encoding/base64"
 	"time"
 
+	grpcclient "github.com/dvaumoron/puzzlegrpcclient"
 	pb "github.com/dvaumoron/puzzlesaltservice"
 	"golang.org/x/crypto/scrypt"
 	"google.golang.org/grpc"
@@ -34,13 +34,11 @@ const p = 1
 const keyLen = 64
 
 type Client struct {
-	saltServiceAddr string
-	dialOptions     grpc.DialOption
-	timeOut         time.Duration
+	grpcclient.Client
 }
 
 func Make(saltServiceAddr string, dialOptions grpc.DialOption, timeOut time.Duration) Client {
-	return Client{saltServiceAddr: saltServiceAddr, dialOptions: dialOptions, timeOut: timeOut}
+	return Client{Client: grpcclient.Make(saltServiceAddr, dialOptions, timeOut)}
 }
 
 func (c Client) Salt(login string, password string) (string, error) {
@@ -57,13 +55,13 @@ func (c Client) Salt(login string, password string) (string, error) {
 }
 
 func (c Client) loadOrGenerate(login string) ([]byte, error) {
-	conn, err := grpc.Dial(c.saltServiceAddr, c.dialOptions)
+	conn, err := c.Dial()
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	ctx, cancel := c.InitContext()
 	defer cancel()
 
 	response, err := pb.NewSaltClient(conn).LoadOrGenerate(ctx, &pb.Request{Login: login})
