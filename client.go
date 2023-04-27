@@ -18,8 +18,8 @@
 package puzzlesaltclient
 
 import (
+	"context"
 	"encoding/base64"
-	"time"
 
 	grpcclient "github.com/dvaumoron/puzzlegrpcclient"
 	pb "github.com/dvaumoron/puzzlesaltservice"
@@ -37,12 +37,12 @@ type Client struct {
 	grpcclient.Client
 }
 
-func Make(saltServiceAddr string, dialOptions grpc.DialOption, timeOut time.Duration) Client {
-	return Client{Client: grpcclient.Make(saltServiceAddr, dialOptions, timeOut)}
+func Make(saltServiceAddr string, dialOptions []grpc.DialOption) Client {
+	return Client{Client: grpcclient.Make(saltServiceAddr, dialOptions...)}
 }
 
-func (c Client) Salt(login string, password string) (string, error) {
-	salt, err := c.loadOrGenerate(login)
+func (c Client) Salt(ctx context.Context, login string, password string) (string, error) {
+	salt, err := c.loadOrGenerate(ctx, login)
 	if err != nil {
 		return "", err
 	}
@@ -54,15 +54,12 @@ func (c Client) Salt(login string, password string) (string, error) {
 	return base64.StdEncoding.EncodeToString(dk), nil
 }
 
-func (c Client) loadOrGenerate(login string) ([]byte, error) {
+func (c Client) loadOrGenerate(ctx context.Context, login string) ([]byte, error) {
 	conn, err := c.Dial()
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Close()
-
-	ctx, cancel := c.InitContext()
-	defer cancel()
 
 	response, err := pb.NewSaltClient(conn).LoadOrGenerate(ctx, &pb.Request{Login: login})
 	if err != nil {
